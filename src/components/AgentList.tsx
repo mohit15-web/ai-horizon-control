@@ -1,9 +1,12 @@
 
 import { useState } from "react";
-import { Search, Users, Settings, Activity } from "lucide-react";
+import { Search, Users, Settings, Activity, Plus, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const agents = [
   {
@@ -56,11 +59,24 @@ const agents = [
 export function AgentList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedAgent, setSelectedAgent] = useState<number | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [newAgent, setNewAgent] = useState({
+    name: "",
+    type: "",
+    description: "",
+  });
 
   const filteredAgents = agents.filter(agent =>
     agent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     agent.type.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleCreateAgent = () => {
+    console.log("Creating new agent:", newAgent);
+    // Here you would typically send the data to your backend
+    setIsCreateDialogOpen(false);
+    setNewAgent({ name: "", type: "", description: "" });
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -70,10 +86,76 @@ export function AgentList() {
           <h1 className="text-3xl font-bold neon-text">AI Agents</h1>
           <p className="text-slate-400 mt-1">Manage and monitor your AI agents</p>
         </div>
-        <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 glow-hover">
-          <Users className="w-4 h-4 mr-2" />
-          Create Agent
-        </Button>
+        
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-medium px-6 py-2 rounded-lg transition-all duration-300 glow-hover">
+              <Plus className="w-4 h-4 mr-2" />
+              Create Agent
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="cyber-card border-slate-700/50 bg-gradient-to-br from-slate-900/95 to-slate-800/90 text-slate-200">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold neon-text">Create New Agent</DialogTitle>
+              <DialogDescription className="text-slate-400">
+                Configure your new AI agent with the details below.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-slate-300">Agent Name</Label>
+                <Input
+                  id="name"
+                  placeholder="Enter agent name"
+                  value={newAgent.name}
+                  onChange={(e) => setNewAgent({ ...newAgent, name: e.target.value })}
+                  className="bg-slate-800/50 border-slate-600 focus:border-cyan-500 focus:ring-cyan-500/20 text-slate-200"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="type" className="text-slate-300">Agent Type</Label>
+                <Select value={newAgent.type} onValueChange={(value) => setNewAgent({ ...newAgent, type: value })}>
+                  <SelectTrigger className="bg-slate-800/50 border-slate-600 focus:border-cyan-500 text-slate-200">
+                    <SelectValue placeholder="Select agent type" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-800 border-slate-700">
+                    <SelectItem value="Language Model">Language Model</SelectItem>
+                    <SelectItem value="Code Analysis">Code Analysis</SelectItem>
+                    <SelectItem value="Content Creation">Content Creation</SelectItem>
+                    <SelectItem value="Analytics">Analytics</SelectItem>
+                    <SelectItem value="Communication">Communication</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="description" className="text-slate-300">Description</Label>
+                <Input
+                  id="description"
+                  placeholder="Brief description of the agent"
+                  value={newAgent.description}
+                  onChange={(e) => setNewAgent({ ...newAgent, description: e.target.value })}
+                  className="bg-slate-800/50 border-slate-600 focus:border-cyan-500 focus:ring-cyan-500/20 text-slate-200"
+                />
+              </div>
+              <div className="flex justify-end space-x-3 pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsCreateDialogOpen(false)}
+                  className="border-slate-600 text-slate-300 hover:bg-slate-800/50 hover:text-slate-200"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleCreateAgent}
+                  className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white"
+                  disabled={!newAgent.name || !newAgent.type}
+                >
+                  Create Agent
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Search and Filters */}
@@ -89,7 +171,10 @@ export function AgentList() {
                 className="pl-10 bg-slate-800/50 border-slate-600 focus:border-cyan-500 focus:ring-cyan-500/20"
               />
             </div>
-            <Button variant="outline" className="border-slate-600 hover:border-cyan-500 hover:text-cyan-400">
+            <Button 
+              variant="outline" 
+              className="border-slate-600 text-slate-300 hover:bg-slate-800/50 hover:border-cyan-500 hover:text-cyan-400 transition-all duration-300"
+            >
               Filter
             </Button>
           </div>
@@ -159,13 +244,21 @@ export function AgentList() {
               {selectedAgent === agent.id && (
                 <div className="border-t border-slate-700 pt-4 mt-4 animate-fade-in">
                   <div className="flex space-x-2">
-                    <Button size="sm" variant="outline" className="border-slate-600 hover:border-cyan-500 hover:text-cyan-400">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="border-slate-600 text-slate-300 hover:bg-slate-800/50 hover:border-cyan-500 hover:text-cyan-400 transition-all duration-300"
+                    >
                       <Activity className="w-4 h-4 mr-1" />
-                      Logs
+                      <span>Logs</span>
                     </Button>
-                    <Button size="sm" variant="outline" className="border-slate-600 hover:border-cyan-500 hover:text-cyan-400">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="border-slate-600 text-slate-300 hover:bg-slate-800/50 hover:border-cyan-500 hover:text-cyan-400 transition-all duration-300"
+                    >
                       <Settings className="w-4 h-4 mr-1" />
-                      Configure
+                      <span>Configure</span>
                     </Button>
                   </div>
                 </div>
