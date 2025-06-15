@@ -31,7 +31,7 @@ const Index = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <AppSidebar />
+        <AppSidebar currentPage={currentPage} setCurrentPage={setCurrentPage} />
         <main className="flex-1 p-6 lg:p-8">
           <div className="mb-4">
             <SidebarTrigger className="text-slate-400 hover:text-cyan-400 transition-colors" />

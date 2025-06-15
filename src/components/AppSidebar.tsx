@@ -8,7 +8,6 @@ import {
   FileText,
   ChevronRight
 } from "lucide-react";
-import { useState } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -25,34 +24,32 @@ import {
 const navigationItems = [
   {
     title: "Dashboard",
-    url: "/",
     icon: Home,
   },
   {
     title: "Agents",
-    url: "/agents",
     icon: Users,
   },
   {
     title: "Activity Logs",
-    url: "/logs",
     icon: Activity,
   },
   {
     title: "Notifications",
-    url: "/notifications",
     icon: Bell,
   },
   {
     title: "Settings",
-    url: "/settings",
     icon: Settings,
   },
 ];
 
-export function AppSidebar() {
-  const [activeItem, setActiveItem] = useState("Dashboard");
+interface AppSidebarProps {
+  currentPage: string;
+  setCurrentPage: (page: string) => void;
+}
 
+export function AppSidebar({ currentPage, setCurrentPage }: AppSidebarProps) {
   return (
     <Sidebar className="border-r border-slate-700/50 bg-gradient-to-b from-slate-900/80 to-slate-800/50 backdrop-blur-sm">
       <SidebarHeader className="border-b border-slate-700/50 p-6">
@@ -77,22 +74,21 @@ export function AppSidebar() {
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
-                    asChild
-                    isActive={activeItem === item.title}
-                    className={`group relative transition-all duration-300 rounded-lg ${
-                      activeItem === item.title
+                    isActive={currentPage === item.title}
+                    className={`group relative transition-all duration-300 rounded-lg cursor-pointer ${
+                      currentPage === item.title
                         ? "bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-500/30 text-cyan-400"
                         : "hover:bg-slate-800/50 hover:border-slate-600/50 text-slate-300 hover:text-cyan-400"
                     }`}
-                    onClick={() => setActiveItem(item.title)}
+                    onClick={() => setCurrentPage(item.title)}
                   >
-                    <a href={item.url} className="flex items-center space-x-3 w-full p-3">
+                    <div className="flex items-center space-x-3 w-full p-3">
                       <item.icon className="w-5 h-5" />
                       <span className="font-medium">{item.title}</span>
-                      {activeItem === item.title && (
+                      {currentPage === item.title && (
                         <ChevronRight className="w-4 h-4 ml-auto text-cyan-400" />
                       )}
-                    </a>
+                    </div>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
